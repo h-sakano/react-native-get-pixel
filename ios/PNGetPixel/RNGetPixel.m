@@ -12,22 +12,38 @@ static CGFloat rotation = M_PI / 2;
 
 RCT_EXPORT_MODULE();
 
-RCT_EXPORT_METHOD(getPixelRGBAofImage:(NSString *)imageName
+RCT_EXPORT_METHOD(getPixelRGBAofImage:(NSString *)filePath
                   atX:(CGFloat)x
                   atY:(CGFloat)y
                   callback:(RCTResponseSenderBlock)callback) {
-    UIImage *image = [UIImage imageNamed:imageName];
+    UIImage *image;
+    if ([filePath hasPrefix:@"data:"] || [filePath hasPrefix:@"file:"]) {
+        NSURL *imageUrl = [[NSURL alloc] initWithString:filePath];
+        image = [UIImage imageWithData:[NSData dataWithContentsOfURL:imageUrl]];
+    }
+    else {
+        image = [[UIImage alloc] initWithContentsOfFile:filePath];
+    }
+
     if (image == nil) {
         return callback(@[@"Could not create image from given path.", @""]);
     }
     [self getPixelColorFromImage:image atX:x atY:y callback:callback];
 }
 
-RCT_EXPORT_METHOD(getPixelRGBAPolarOfImage:(NSString *)imageName
+RCT_EXPORT_METHOD(getPixelRGBAPolarOfImage:(NSString *)filePath
                   angle:(CGFloat)angle
                   radius:(CGFloat)radius
                   callback:(RCTResponseSenderBlock)callback) {
-    UIImage *image = [UIImage imageNamed:imageName];
+    UIImage *image;
+    if ([filePath hasPrefix:@"data:"] || [filePath hasPrefix:@"file:"]) {
+        NSURL *imageUrl = [[NSURL alloc] initWithString:filePath];
+        image = [UIImage imageWithData:[NSData dataWithContentsOfURL:imageUrl]];
+    }
+    else {
+        image = [[UIImage alloc] initWithContentsOfFile:filePath];
+    }
+
     if (image == nil) {
         return callback(@[@"Could not create image from given path.", @""]);
     }
@@ -43,13 +59,21 @@ RCT_EXPORT_METHOD(getPixelRGBAPolarOfImage:(NSString *)imageName
     [self getPixelColorFromImage:image atX:x atY:y callback:callback];
 }
 
-RCT_EXPORT_METHOD(findAngleOfNearestColor:(NSString *)imageName
+RCT_EXPORT_METHOD(findAngleOfNearestColor:(NSString *)filePath
                   minAngle:(CGFloat)minAngle
                   maxAngle:(CGFloat)maxAngle
                   radius:(CGFloat)radius
                   targetColor:(NSArray*)targetColor
                   callback:(RCTResponseSenderBlock)callback) {
-    UIImage *image = [UIImage imageNamed:imageName];
+    UIImage *image;
+    if ([filePath hasPrefix:@"data:"] || [filePath hasPrefix:@"file:"]) {
+        NSURL *imageUrl = [[NSURL alloc] initWithString:filePath];
+        image = [UIImage imageWithData:[NSData dataWithContentsOfURL:imageUrl]];
+    }
+    else {
+        image = [[UIImage alloc] initWithContentsOfFile:filePath];
+    }
+
     if (image == nil) {
         return callback(@[@"Could not create image from given path.", @""]);
     }
