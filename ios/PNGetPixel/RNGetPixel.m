@@ -23,11 +23,19 @@ RCT_EXPORT_METHOD(getPixelRGBAofImage:(NSString *)imageName
     [self getPixelColorFromImage:image atX:x atY:y callback:callback];
 }
 
-RCT_EXPORT_METHOD(getPixelRGBAPolarOfImage:(NSString *)imageName
+RCT_EXPORT_METHOD(getPixelRGBAPolarOfImage:(NSString *)path
                   angle:(CGFloat)angle
                   radius:(CGFloat)radius
                   callback:(RCTResponseSenderBlock)callback) {
-    UIImage *image = [UIImage imageNamed:imageName];
+
+    if ([path hasPrefix:@"data:"] || [path hasPrefix:@"file:"]) {
+        NSURL *imageUrl = [[NSURL alloc] initWithString:path];
+        image = [UIImage imageWithData:[NSData dataWithContentsOfURL:imageUrl]];
+    }
+    else {
+        image = [[UIImage alloc] initWithContentsOfFile:path];
+    }
+
     if (image == nil) {
         return callback(@[@"Could not create image from given path.", @""]);
     }
