@@ -2,6 +2,7 @@ package org.bvic23.rngetpixel;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -37,9 +38,9 @@ class RNPixelColorModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void getPixelRGBAofImage(final String imageName, final int x, final int y, final Callback callback) {
+    public void getPixelRGBAofImage(final String filePath, final int x, final int y, final Callback callback) {
         try {
-            final Bitmap bitmap = loadImage(imageName);
+            final Bitmap bitmap = loadImage(filePath);
             final int pixel = bitmap.getPixel(x, y);
             respondWithPixel(callback, pixel);
         } catch (Exception e) {
@@ -48,9 +49,9 @@ class RNPixelColorModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void getPixelRGBAPolarOfImage(final String imageName, final double angle, final double radius, final Callback callback) {
+    public void getPixelRGBAPolarOfImage(final String filePath, final double angle, final double radius, final Callback callback) {
         try {
-            final Bitmap image = loadImage(imageName);
+            final Bitmap image = loadImage(filePath);
             final double width = image.getWidth();
             final double height = image.getHeight();
             final double rotatedAngle = angle + rotation;
@@ -69,9 +70,9 @@ class RNPixelColorModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void findAngleOfNearestColor(final String imageName, final double minAngle, final double maxAngle, final double radius, final ReadableArray targetColor, final Callback callback) {
+    public void findAngleOfNearestColor(final String filePath, final double minAngle, final double maxAngle, final double radius, final ReadableArray targetColor, final Callback callback) {
         try {
-            final Bitmap image = loadImage(imageName);
+            final Bitmap image = loadImage(filePath);
             final double width = image.getWidth();
             final double height = image.getHeight();
 
@@ -125,9 +126,11 @@ class RNPixelColorModule extends ReactContextBaseJavaModule {
         callback.invoke(null, result);
     }
 
-    private Bitmap loadImage(final String imageName) throws IOException {
-        final InputStream inputStream = context.getAssets().open("drawable/" + imageName + ".png");
-        final Drawable drawable = Drawable.createFromStream(inputStream, null);
-        return ((BitmapDrawable) drawable).getBitmap();
+    private Bitmap loadImage(final String filePath) throws IOException {
+        try {
+            return BitmapFactory.decodeFile(getContentResolver().openInputStream(filePath));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }
