@@ -7,4 +7,8 @@
               green:(CGFloat*)green
                blue:(CGFloat*)blue;
 
+- (BOOL)rgbaAverage:(CGFloat*)red
+              green:(CGFloat*)green
+               blue:(CGFloat*)blue;
+
 @end

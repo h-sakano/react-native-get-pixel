@@ -49,6 +49,36 @@ class RNPixelColorModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void getPixelRGBAverageOfImage(final String filePath, final Callback callback) {
+        try {
+            final Bitmap bitmap = loadImage(filePath);
+            
+	        int height = bitmap.getHeight();
+	        int width = bitmap.getWidth();
+            int pixel_num = width * height;
+
+	        int[] pixels = new int[width * height];
+	        bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
+
+            int total_r = 0;
+            int total_g = 0;
+            int total_b = 0;
+            
+	        for (int i = 0; i < pixels.length; i += pixelSpacing) {
+	        	int color = pixels[i];
+	        	total_r += Color.red(color);
+	        	total_g += Color.green(color);
+	        	total_b += Color.blue(color);
+	        }
+	        final int average_color = Color.rgb(total_r / pixel_num, total_g / pixel_num, total_b / pixel_num);
+
+            respondWithPixel(callback, average_color);
+        } catch (Exception e) {
+            callback.invoke(e.getMessage());
+        }
+    }
+
+    @ReactMethod
     public void getPixelRGBAPolarOfImage(final String filePath, final double angle, final double radius, final Callback callback) {
         try {
             final Bitmap image = loadImage(filePath);

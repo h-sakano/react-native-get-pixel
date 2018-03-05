@@ -31,6 +31,23 @@ RCT_EXPORT_METHOD(getPixelRGBAofImage:(NSString *)filePath
     [self getPixelColorFromImage:image atX:x atY:y callback:callback];
 }
 
+RCT_EXPORT_METHOD(getPixelRGBAverageOfImage:(NSString *)filePath
+                  callback:(RCTResponseSenderBlock)callback) {
+    UIImage *image;
+    if ([filePath hasPrefix:@"data:"] || [filePath hasPrefix:@"file:"]) {
+        NSURL *imageUrl = [[NSURL alloc] initWithString:filePath];
+        image = [UIImage imageWithData:[NSData dataWithContentsOfURL:imageUrl]];
+    }
+    else {
+        image = [[UIImage alloc] initWithContentsOfFile:filePath];
+    }
+
+    if (image == nil) {
+        return callback(@[@"Could not create image from given path.", @""]);
+    }
+    [self getAverageColorFromImage:image callback:callback];
+}
+
 RCT_EXPORT_METHOD(getPixelRGBAPolarOfImage:(NSString *)filePath
                   angle:(CGFloat)angle
                   radius:(CGFloat)radius
@@ -125,5 +142,16 @@ RCT_EXPORT_METHOD(findAngleOfNearestColor:(NSString *)filePath
     }
 }
 
+- (void)getAverageColorFromImage:(UIImage*)image callback:(RCTResponseSenderBlock)callback {
+    CGFloat red;
+    CGFloat green;
+    CGFloat blue;
+    BOOL success = [image rgbaAverage:&red green:&green blue:&blue];
+    if (success) {
+        callback(@[[NSNull null], @[@(red), @(green), @(blue)]]);
+    } else {
+        callback(@[@"Could not create image from given path.", @""]);
+    }
+}
 
 @end
