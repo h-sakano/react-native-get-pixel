@@ -45,33 +45,7 @@ RCT_EXPORT_METHOD(getPixelRGBAverageOfImage:(NSString *)filePath
     if (image == nil) {
         return callback(@[@"Could not create image from given path.", @""]);
     }
-
-    CGFloat width = image.size.width;
-    CGFloat height = image.size.height;
-    CGFloat total_r = 0;
-    CGFloat total_g = 0;
-    CGFloat total_b = 0;
-
-    for (int x = 0; x < width; x++) {
-        for (int y = 0; y < height; y++) {
-            CGPoint point = CGPointMake(x, y);
-            CGFloat red;
-            CGFloat green;
-            CGFloat blue;
-            BOOL success = [image rgbaAtPixel:point red:&red green:&green blue:&blue];
-            if (success) {
-                total_r += red;
-                total_g += green;
-                total_b += blue;
-            } else {
-                return callback(@[@"Could not create image from given path.", @""]);
-            }
-        }
-    }
-    CGFloat average_r = total_r / (width * height);
-    CGFloat average_g = total_g / (width * height);
-    CGFloat average_b = total_b / (width * height);
-    callback(@[[NSNull null], @[@(average_r), @(average_g), @(average_b)]]);
+    [self getAverageColorFromImage:image callback:callback];
 }
 
 RCT_EXPORT_METHOD(getPixelRGBAPolarOfImage:(NSString *)filePath
@@ -168,5 +142,16 @@ RCT_EXPORT_METHOD(findAngleOfNearestColor:(NSString *)filePath
     }
 }
 
+- (void)getAverageColorFromImage:(UIImage*)image callback:(RCTResponseSenderBlock)callback {
+    CGFloat red;
+    CGFloat green;
+    CGFloat blue;
+    BOOL success = [image rgbaAverage:&red green:&green blue:&blue];
+    if (success) {
+        callback(@[[NSNull null], @[@(red), @(green), @(blue)]]);
+    } else {
+        callback(@[@"Could not create image from given path.", @""]);
+    }
+}
 
 @end
